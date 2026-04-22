@@ -1,20 +1,19 @@
 using Microsoft.JSInterop;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Blazor.Utils.NoOpJSRuntime.Tests;
 
-[Collection("Collection")]
-public sealed class NoOpJSRuntimeTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public sealed class NoOpJSRuntimeTests : HostedUnitTest
 {
     private readonly IJSRuntime _util;
 
-    public NoOpJSRuntimeTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public NoOpJSRuntimeTests(Host host) : base(host)
     {
         _util = Resolve<IJSRuntime>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
