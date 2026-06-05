@@ -9,6 +9,9 @@ namespace Soenneker.Blazor.Utils.NoOpJSRuntime;
 /// Useful for tests, prerendering, or environments where JS interop is intentionally disabled.
 /// </summary>
 // ReSharper disable once InconsistentNaming
+/// <summary>
+/// Represents the no op js runtime.
+/// </summary>
 public sealed class NoOpJSRuntime : IJSRuntime
 {
     /// <summary>
