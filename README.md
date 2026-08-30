@@ -5,40 +5,65 @@
 
 # Soenneker.Blazor.Utils.NoOpJSRuntime
 
-An IJSRuntime implementation that returns default values and performs no work.
+An `IJSRuntime` stub that performs no JavaScript invocation and immediately returns `default(TValue)`.
 
-## Install
+Use it in tests or deliberately non-browser rendering paths where JavaScript effects are irrelevant and callers already tolerate default results. It does not emulate a browser or verify which calls were made.
+
+## Installation
 
 ```bash
 dotnet add package Soenneker.Blazor.Utils.NoOpJSRuntime
 ```
 
-## Quick start
+## Direct use
+
+```csharp
+IJSRuntime jsRuntime = new NoOpJSRuntime();
+
+bool result = await jsRuntime.InvokeAsync<bool>("feature.isAvailable");
+// result is false; JavaScript was not called.
+```
+
+Return behavior follows `default(TValue)`:
+
+- `bool` returns `false`.
+- Numeric value types return zero.
+- Nullable and reference types return `null`.
+- `InvokeVoidAsync` completes successfully.
+
+Arguments are ignored and are not serialized. Invalid argument shapes that would fail real Blazor interop therefore do not fail here.
+
+The cancellation-token overload returns a cancelled task when its token is already cancelled. Because every invocation otherwise completes synchronously, cancellation requested after the call cannot affect it.
+
+## Dependency injection
+
+Register one stateless instance for the application:
 
 ```csharp
 using Soenneker.Blazor.Utils.NoOpJSRuntime.Registrars;
-using Microsoft.Extensions.DependencyInjection;
 
-var services = new ServiceCollection();
-var result = services.AddNoOpJSRuntimeAsSingleton();
+services.AddNoOpJSRuntimeAsSingleton();
 ```
 
-Adds `NoOpJSRuntime` as a singleton service.
+A scoped registrar is also available:
 
-## What you get
+```csharp
+services.AddNoOpJSRuntimeAsScoped();
+```
 
-- `NoOpJSRuntimeRegistrar` — An IJSRuntime implementation that returns default values and performs no work.
-- `NoOpJSRuntime` — Represents the no op js runtime.
+Both registrars use `TryAdd`, so they do not replace an `IJSRuntime` registration that already exists. In a test host where replacement is intentional, remove the existing descriptor first:
 
-## API at a glance
+```csharp
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `NoOpJSRuntimeRegistrar.AddNoOpJSRuntimeAsSingleton(services)` | Adds `NoOpJSRuntime` as a singleton service. | The same service collection, so additional registrations can be chained. |
-| `NoOpJSRuntimeRegistrar.AddNoOpJSRuntimeAsScoped(services)` | Adds `NoOpJSRuntime` as a scoped service. | The same service collection, so additional registrations can be chained. |
-| `NoOpJSRuntime.InvokeAsync(identifier, args)` | Always returns default(`TValue`) and performs no JS invocation. | A task whose result is the value returned by invoke Async. |
-| `NoOpJSRuntime.InvokeAsync(identifier, cancellationToken, args)` | Always returns default(`TValue`) and performs no JS invocation. | A task whose result is the value returned by invoke Async. |
+services.RemoveAll<IJSRuntime>();
+services.AddNoOpJSRuntimeAsSingleton();
+```
 
-## Practical notes
+## When not to use it
 
-- Cancellation stops pending work; it does not undo work that has already completed.
+Do not use this runtime when the code under test must import an `IJSObjectReference`, read a non-null string or object, mutate browser state, or prove that a JavaScript call occurred. Default reference results can cause later null failures, while void calls can create false confidence that work succeeded.
+
+Use a configurable or recording mock when assertions about identifiers, arguments, return values, or call counts matter. In production prerendering, prefer deferring browser-dependent work until interactive rendering rather than silently pretending that required JavaScript completed.
+
+This runtime is not a security boundary. Replacing interop with a no-op must never bypass server-side authorization, validation, or required integrity checks.
