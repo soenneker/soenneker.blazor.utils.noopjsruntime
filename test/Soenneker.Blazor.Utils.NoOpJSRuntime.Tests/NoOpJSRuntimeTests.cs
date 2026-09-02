@@ -18,9 +18,9 @@ public sealed class NoOpJSRuntimeTests : HostedUnitTest
     }
 
     [Test]
-    public async Task Returns_default_value()
+    public async Task Returns_default_value(CancellationToken cancellationToken)
     {
-        bool value = await _util.InvokeAsync<bool>("test.value");
+        bool value = await _util.InvokeAsync<bool>("test.value", cancellationToken);
         value.Should().BeFalse();
     }
 
