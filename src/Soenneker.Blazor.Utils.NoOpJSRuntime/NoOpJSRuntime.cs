@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ public sealed class NoOpJSRuntime : IJSRuntime
     /// <param name="identifier">Identifier of the target value.</param>
     /// <param name="args">Arguments that would have been passed to JavaScript.</param>
     /// <returns>A completed task containing the default value for <typeparamref name="TValue"/>.</returns>
-    public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
+    public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, object?[]? args)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
         return new ValueTask<TValue>(default(TValue)!);
@@ -32,7 +33,7 @@ public sealed class NoOpJSRuntime : IJSRuntime
     /// <param name="cancellationToken">Token used to cancel the operation.</param>
     /// <param name="args">Arguments that would have been passed to JavaScript.</param>
     /// <returns>A completed task containing the default value for <typeparamref name="TValue"/>, or a cancelled task when cancellation was already requested.</returns>
-    public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
+    public ValueTask<TValue> InvokeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)] TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(identifier);
 
