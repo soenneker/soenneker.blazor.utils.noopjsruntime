@@ -25,7 +25,7 @@ public sealed class NoOpJSRuntimeTests : HostedUnitTest
     }
 
     [Test]
-    public async ValueTask Honors_pre_cancelled_token()
+    public async ValueTask Honors_pre_cancelled_token(CancellationToken cancellationToken)
     {
         using var source = new CancellationTokenSource();
         await source.CancelAsync();
