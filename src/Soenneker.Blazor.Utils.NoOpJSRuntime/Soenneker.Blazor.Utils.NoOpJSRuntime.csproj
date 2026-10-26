@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <Nullable>enable</Nullable>
         <IsAotCompatible>true</IsAotCompatible>
         <Platforms>AnyCPU</Platforms>
@@ -9,7 +9,7 @@
 
     <PropertyGroup>
         <Description>An IJSRuntime implementation that returns default values and performs no work.</Description>
-        <Version Condition="'$(BUILD_VERSION)' == ''">4.0.0</Version>
+        <Version Condition="'$(BUILD_VERSION)' == ''">11.0.0</Version>
         <Version Condition="'$(BUILD_VERSION)' != ''">$(BUILD_VERSION)</Version>
         <AssemblyName>Soenneker.Blazor.Utils.NoOpJSRuntime</AssemblyName>
         <PackageId>Soenneker.Blazor.Utils.NoOpJSRuntime</PackageId>
@@ -45,6 +45,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.14" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="11.0.0-rc.3.26522.148" />
     </ItemGroup>
 </Project>
