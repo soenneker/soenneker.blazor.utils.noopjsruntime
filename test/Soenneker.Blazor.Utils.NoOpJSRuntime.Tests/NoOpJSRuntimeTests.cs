@@ -20,8 +20,15 @@ public sealed class NoOpJSRuntimeTests : HostedUnitTest
     [Test]
     public async ValueTask Returns_default_value(CancellationToken cancellationToken)
     {
-        bool value = await _util.InvokeAsync<bool>("test.value", cancellationToken);
-        value.Should().BeFalse();
+        try
+        {
+            bool value = await _util.InvokeAsync<bool>("test.value", cancellationToken);
+            value.Should().BeFalse();
+        }
+        catch (JSException exception)
+        {
+            throw new InvalidOperationException("The no-op runtime must not execute JavaScript.", exception);
+        }
     }
 
     [Test]
@@ -30,8 +37,16 @@ public sealed class NoOpJSRuntimeTests : HostedUnitTest
         using var source = new CancellationTokenSource();
         await source.CancelAsync();
 
-        Func<Task> act = async () => await _util.InvokeAsync<bool>("test.value", source.Token);
+        try
+        {
+            await _util.InvokeAsync<bool>("test.value", source.Token);
+        }
+        catch (OperationCanceledException exception)
+        {
+            exception.CancellationToken.Should().Be(source.Token);
+            return;
+        }
 
-        await act.Should().ThrowAsync<OperationCanceledException>();
+        throw new InvalidOperationException("The no-op runtime must honor a pre-cancelled token.");
     }
 }
